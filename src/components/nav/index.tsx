@@ -20,14 +20,14 @@ const Nav = () => {
 
   if (user == null) return null;
   return (
-    <motion.nav initial={{opacity: 0}} animate={{opacity:1}} transition={{delay:1.3, duration: 1}} className='h-10 flex items-center justify-between px-3'>
+    <motion.nav initial={{opacity: 0}} animate={{opacity:1}} transition={{delay:1.3, duration: 1}} className=' shadow-sm p-2 flex items-center justify-between px-3'>
       <div className='flex gap-3 items-center'>
-        <Button size='sm' variant="link">Home</Button>
+        <Button variant="link">Home</Button>
         <NavigationWorkspaces workspaces={workspaces} />
       </div>
-      <div className='flex gap-3'>
+      <div className='flex items-center space-x-3'>
             <DropdownProfile username = {user.username} avatar={user.avatar}/>
-        <Button size={"sm"}>Upgrade</Button>
+            <Button>Upgrade</Button>
       </div>
     </motion.nav>
   );

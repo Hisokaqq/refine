@@ -18,7 +18,7 @@ const DropdownProfile = ({username, avatar}: User) => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Avatar className='h-8 w-8 cursor-pointer'>
+          <Avatar className='h-9 w-9 cursor-pointer'>
               <AvatarImage src={avatar} />
               <AvatarFallback>{username.substring(0,1)}</AvatarFallback>
           </Avatar>

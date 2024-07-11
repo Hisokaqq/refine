@@ -41,7 +41,6 @@ type Workspace = {
   title: string;
   dateOfChange: Date;
 };
-
 const initialWorkspaces: Workspace[] = [
   { id: "1", title: "Refine Project", dateOfChange: new Date("2024-07-10") },
   { id: "2", title: "E-commerce Platform", dateOfChange: new Date("2024-07-09") },
@@ -169,13 +168,22 @@ export function WorkspaceTable() {
           onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
           className="max-w-sm"
         />
+        <div className="space-x-2">
+        <Button
+          size={'sm'}
+          variant="outline" 
+        >
+          Create
+        </Button>
         <Button 
+          size={'sm'}
           variant="destructive" 
           onClick={() => handleDelete(selectedRowIds)}
           disabled={isDeleteButtonDisabled}
         >
           Delete
         </Button>
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>

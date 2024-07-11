@@ -22,7 +22,7 @@ const ListItem = React.forwardRef<
           className={`block select-none space-y-1 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground ${className}`}
           {...props}
         >
-          <div className="text-xs font-medium leading-none">{title}</div>
+          <div className=" font-medium leading-none">{title}</div>
           <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">{children}</p>
         </Link>
       </NavigationMenuLink>
@@ -46,7 +46,7 @@ function NavigationWorkspaces({ workspaces }: NavigationMenuDemoProps) {
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="px-3 py-2 h-8 text-xs bg-transparent">
+          <NavigationMenuTrigger className="px-3 py-2 h-8  bg-transparent">
             Workspaces
           </NavigationMenuTrigger>
           <NavigationMenuContent>
