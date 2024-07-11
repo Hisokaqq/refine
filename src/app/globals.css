@@ -67,3 +67,5 @@
       @apply bg-background text-foreground;
     }
   }
+
+/* Remove hover effect for the trigger */
