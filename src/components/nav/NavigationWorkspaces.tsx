@@ -22,7 +22,7 @@ const ListItem = React.forwardRef<
           className={`block select-none space-y-1 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground ${className}`}
           {...props}
         >
-          <div className=" font-medium leading-none">{title}</div>
+          <div className="text-xs font-medium leading-none">{title?.substring(1, 60)}</div>
           <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">{children}</p>
         </Link>
       </NavigationMenuLink>
@@ -31,22 +31,16 @@ const ListItem = React.forwardRef<
 });
 ListItem.displayName = 'ListItem';
 
-type Workspace = {
-  id: string;
-  title: string;
-  dateOfChange: Date;
-};
 
-type NavigationMenuDemoProps = {
-  workspaces: Workspace[];
-};
 
-function NavigationWorkspaces({ workspaces }: NavigationMenuDemoProps) {
+
+
+function NavigationWorkspaces({ workspaces }: Workspaces) {
   return (
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="px-3 py-2 h-8  bg-transparent">
+          <NavigationMenuTrigger className="px-3 py-2 h-8 bg-transparent">
             Workspaces
           </NavigationMenuTrigger>
           <NavigationMenuContent>
@@ -54,7 +48,7 @@ function NavigationWorkspaces({ workspaces }: NavigationMenuDemoProps) {
               {workspaces.length > 0 ? (
                 workspaces.map((workspace) => (
                   <ListItem key={workspace.id} id={workspace.id} title={workspace.title}>
-                    {`Last changed: ${workspace.dateOfChange.toLocaleDateString()}`}
+                    {`Last changed: ${workspace.updatedAt ? workspace.updatedAt.toLocaleDateString() : 'N/A'}`}
                   </ListItem>
                 ))
               ) : (

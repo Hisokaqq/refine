@@ -1,9 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  DotsHorizontalIcon,
-} from "@radix-ui/react-icons";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -14,7 +12,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -35,12 +32,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Link from "next/link";
 
 type Workspace = {
   id: string;
   title: string;
   dateOfChange: Date;
 };
+
 const initialWorkspaces: Workspace[] = [
   { id: "1", title: "Refine Project", dateOfChange: new Date("2024-07-10") },
   { id: "2", title: "E-commerce Platform", dateOfChange: new Date("2024-07-09") },
@@ -59,8 +58,6 @@ export function WorkspaceTable() {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = React.useState<{ [key: string]: boolean }>({});
   const [data, setData] = React.useState<Workspace[]>(initialWorkspaces);
-
-  const router = useRouter();
 
   const handleDelete = (ids: string[]) => {
     setData((prevData) => prevData.filter((workspace) => !ids.includes(workspace.id)));
@@ -94,9 +91,11 @@ export function WorkspaceTable() {
       accessorKey: "title",
       header: "Title",
       cell: ({ row }) => (
-        <Button variant="link" className="text-left pl-0" onClick={() => router.push(`/workspace/${row.original.id}`)}>
-          {row.getValue("title")}
+        <Link href={`/workspace/${row.original.id}`} target="_blank">
+        <Button variant="link" className="text-left pl-0">
+            {row.getValue("title")}
         </Button>
+        </Link>
       ),
     },
     {
@@ -104,7 +103,7 @@ export function WorkspaceTable() {
       header: () => <div className="text-right">Date of Change</div>,
       cell: ({ row }) => {
         const date = row.getValue("dateOfChange") as Date;
-        return <div className="text-right">{date.toLocaleDateString()}</div>;
+        return <div className="text-right">{new Date(date).toISOString().slice(0, 10)}</div>;
       },
     },
     {
@@ -125,9 +124,11 @@ export function WorkspaceTable() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => router.push(`/workspace/${workspace.id}`)}>
-                  View
+                <Link href={`/workspace/${workspace.id}`} target="_blank">
+                <DropdownMenuItem>
+                    View
                 </DropdownMenuItem>
+                </Link>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => handleDelete([workspace.id])}>
                   <span className="text-red-600">Delete</span>
