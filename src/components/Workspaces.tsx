@@ -12,7 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-
+import { BarLoader } from "react-spinners";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -36,19 +36,27 @@ import Link from "next/link";
 
 import { createWorkspace, getLastWorkspaces } from "@/app/actions/workspace.action";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function WorkspaceTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = React.useState<{ [key: string]: boolean }>({});
   const [data, setData] = React.useState<Workspace[]>([]);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const router = useRouter();
   React.useEffect(() => {
     const fetchWorkspaces = async () => {
-      const { workspaces, success } = await getLastWorkspaces({ n: 10 });
+      setIsLoading(true);
+      const { workspaces, success, error } = await getLastWorkspaces({ n: 10 });
+      console.log("Workspaces");
       if (success && workspaces) {
         setData(workspaces);
+        toast.success("Workspaces loaded");
+      }else if(error){
+        toast.error(error.toString());
       }
+      setIsLoading(false);
     };
     fetchWorkspaces();
   }, []);
@@ -175,6 +183,12 @@ export function WorkspaceTable() {
 
   return (
     <div className="w-full">
+      {isLoading ?
+      <div className="absolute right-1/2 top-1/2 translate-x-[50%] ">
+      <BarLoader/>
+      </div>
+      :
+      <>
       <div className="flex justify-between gap-4 items-center py-4">
         <Input
           placeholder="Filter titles..."
@@ -240,6 +254,9 @@ export function WorkspaceTable() {
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
       </div>
+      </>
+      }
     </div>
+    
   );
 }
