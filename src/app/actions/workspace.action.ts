@@ -8,13 +8,13 @@ export const createWorkspace = async ({ title }: { title: string }) => {
         title,
       },
     });
-    return { message: "Workspace created successfully", success: true };
+    return { message: "Workspace created successfully", data: workspace, success: true };
   } catch (err) {
     return { error: err, success: false };
   }
 };
 
-export const getLastWorkspaces = async ({ n }: { n: number }) => {
+export const getLastWorkspaces = async ({ n }: { n?: number }) => {
   try {
     const workspaces = await prisma.workspace.findMany({
       take: n,

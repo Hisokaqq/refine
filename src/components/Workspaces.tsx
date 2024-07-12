@@ -34,34 +34,42 @@ import {
 } from "@/components/ui/table";
 import Link from "next/link";
 
-type Workspace = {
-  id: string;
-  title: string;
-  dateOfChange: Date;
-};
-
-const initialWorkspaces: Workspace[] = [
-  { id: "1", title: "Refine Project", dateOfChange: new Date("2024-07-10") },
-  { id: "2", title: "E-commerce Platform", dateOfChange: new Date("2024-07-09") },
-  { id: "3", title: "Social Media App", dateOfChange: new Date("2024-07-08") },
-  { id: "4", title: "Project Management Tool", dateOfChange: new Date("2024-07-07") },
-  { id: "5", title: "Blog Website", dateOfChange: new Date("2024-07-06") },
-  { id: "6", title: "Portfolio Site", dateOfChange: new Date("2024-07-05") },
-  { id: "7", title: "Financial Dashboard", dateOfChange: new Date("2024-07-04") },
-  { id: "8", title: "Customer Support System", dateOfChange: new Date("2024-07-03") },
-  { id: "9", title: "Marketing Analytics", dateOfChange: new Date("2024-07-02") },
-  { id: "10", title: "HR Management System", dateOfChange: new Date("2024-07-01") },
-];
+import { createWorkspace, getLastWorkspaces } from "@/app/actions/workspace.action";
+import { useRouter } from "next/navigation";
 
 export function WorkspaceTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = React.useState<{ [key: string]: boolean }>({});
-  const [data, setData] = React.useState<Workspace[]>(initialWorkspaces);
+  const [data, setData] = React.useState<Workspace[]>([]);
+  const router = useRouter();
+  React.useEffect(() => {
+    const fetchWorkspaces = async () => {
+      const { workspaces, success } = await getLastWorkspaces({ n: 10 });
+      if (success && workspaces) {
+        setData(workspaces);
+      }
+    };
+    fetchWorkspaces();
+  }, []);
 
   const handleDelete = (ids: string[]) => {
+    console.log("Delete workspaces", ids);
     setData((prevData) => prevData.filter((workspace) => !ids.includes(workspace.id)));
     setRowSelection({});
+  };
+
+  const handleCreate = async () => {
+    console.log("Create workspace");
+    const {data, success} = await createWorkspace({title: "Workspace"})
+    if(success && data){
+      //toast
+      router.push(`/workspace/${data.id}`);
+    }
+    else{
+      //toast
+    }
+
   };
 
   const columns: ColumnDef<Workspace>[] = [
@@ -92,23 +100,27 @@ export function WorkspaceTable() {
       header: "Title",
       cell: ({ row }) => (
         <Link href={`/workspace/${row.original.id}`} target="_blank">
-        <Button variant="link" className="text-left pl-0">
+          <Button variant="link" className="text-left pl-0">
             {row.getValue("title")}
-        </Button>
+          </Button>
         </Link>
       ),
     },
     {
-      accessorKey: "dateOfChange",
+      accessorKey: "updatedAt",
       header: () => <div className="text-right">Date of Change</div>,
       cell: ({ row }) => {
-        const date = row.getValue("dateOfChange") as Date;
-        return <div className="text-right">{new Date(date).toISOString().slice(0, 10)}</div>;
+        const date = row.getValue("updatedAt") as string;
+        return (
+          <div className="text-right">
+            {date ? new Date(date).toLocaleDateString() : "N/A"}
+          </div>
+        );
       },
     },
     {
       id: "actions",
-      header: () => <div className="text-right pr-2">Actions</div>,
+      header: () => <div className="text-right pr-2"></div>,
       enableHiding: false,
       cell: ({ row }) => {
         const workspace = row.original;
@@ -125,9 +137,7 @@ export function WorkspaceTable() {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <Link href={`/workspace/${workspace.id}`} target="_blank">
-                <DropdownMenuItem>
-                    View
-                </DropdownMenuItem>
+                  <DropdownMenuItem>View</DropdownMenuItem>
                 </Link>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => handleDelete([workspace.id])}>
@@ -157,7 +167,10 @@ export function WorkspaceTable() {
     },
   });
 
-  const selectedRowIds = Object.keys(rowSelection).filter((key) => rowSelection[key]);
+  const selectedRowIds = Object.keys(rowSelection)
+    .filter((key) => rowSelection[key])
+    .map((key) => table.getRowModel().rows[parseInt(key)].original.id);
+
   const isDeleteButtonDisabled = selectedRowIds.length === 0;
 
   return (
@@ -170,20 +183,17 @@ export function WorkspaceTable() {
           className="max-w-sm"
         />
         <div className="gap-2 flex">
-        <Button
-          size={'sm'}
-          variant="outline" 
-        >
-          Create
-        </Button>
-        <Button 
-          size={'sm'}
-          variant="destructive" 
-          onClick={() => handleDelete(selectedRowIds)}
-          disabled={isDeleteButtonDisabled}
-        >
-          Delete
-        </Button>
+          <Button size={'sm'} variant="outline" onClick={handleCreate}>
+            Create
+          </Button>
+          <Button
+            size={'sm'}
+            variant="destructive"
+            onClick={() => handleDelete(selectedRowIds)}
+            disabled={isDeleteButtonDisabled}
+          >
+            Delete
+          </Button>
         </div>
       </div>
       <div className="rounded-md border">
@@ -223,6 +233,12 @@ export function WorkspaceTable() {
             )}
           </TableBody>
         </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div>
       </div>
     </div>
   );
