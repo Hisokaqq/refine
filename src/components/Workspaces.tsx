@@ -161,14 +161,14 @@ export function WorkspaceTable() {
 
   return (
     <div className="w-full">
-      <div className="flex justify-between items-center py-4">
+      <div className="flex justify-between gap-4 items-center py-4">
         <Input
           placeholder="Filter titles..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
           onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
           className="max-w-sm"
         />
-        <div className="space-x-2">
+        <div className="gap-2 flex">
         <Button
           size={'sm'}
           variant="outline" 
