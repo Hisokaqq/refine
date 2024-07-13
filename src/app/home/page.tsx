@@ -8,7 +8,7 @@ const Home = () => {
   return (
     <div>
       <Loader />
-      <motion.div initial={{opacity: 0}} animate={{opacity:1}} transition={{delay:1.3, duration: .3}} className="px-3">
+      <motion.div initial={{opacity: 0}} animate={{opacity:1}} transition={{delay:1.3, duration: .3}} className="px-7">
         <WorkspaceTable/>
       </motion.div>
     </div>

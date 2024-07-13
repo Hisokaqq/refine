@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Nav from "@/components/nav";
-import { Toaster } from "sonner"
+import { Toaster } from "@/components/ui/toaster";
+import NavLandingAuth from "@/components/nav/NavLandingAuth";
+import NavOther from "@/components/nav/NavOther";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,11 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Nav />
+        <NavLandingAuth />
+        <NavOther />
         {children}
-        <Toaster richColors/>
+        <Toaster />
       </body>
-      
     </html>
   );
 }

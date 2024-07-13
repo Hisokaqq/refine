@@ -33,51 +33,80 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
+import { useToast } from "@/components/ui/use-toast";
+import { AnimatePresence, motion } from "framer-motion";
 
-import { createWorkspace, getLastWorkspaces } from "@/app/actions/workspace.action";
+import {
+  createWorkspace,
+  deleteWorkspaces,
+  getLastWorkspaces,
+} from "@/app/actions/workspace.action";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 export function WorkspaceTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [rowSelection, setRowSelection] = React.useState<{ [key: string]: boolean }>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [rowSelection, setRowSelection] = React.useState<{
+    [key: string]: boolean;
+  }>({});
   const [data, setData] = React.useState<Workspace[]>([]);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const router = useRouter();
+  const { toast } = useToast();
+
   React.useEffect(() => {
     const fetchWorkspaces = async () => {
       setIsLoading(true);
-      const { workspaces, success, error } = await getLastWorkspaces({ n: 10 });
-      console.log("Workspaces");
+      const { workspaces, success, error } = await getLastWorkspaces({});
       if (success && workspaces) {
         setData(workspaces);
-        toast.success("Workspaces loaded");
-      }else if(error){
-        toast.error(error.toString());
+      } else if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.toString(),
+        });
       }
       setIsLoading(false);
     };
     fetchWorkspaces();
   }, []);
 
-  const handleDelete = (ids: string[]) => {
-    console.log("Delete workspaces", ids);
-    setData((prevData) => prevData.filter((workspace) => !ids.includes(workspace.id)));
+  const handleDelete = async (ids: string[]) => {
+    const { success } = await deleteWorkspaces(ids);
+    if (success) {
+      setData((prevData) =>
+        prevData.filter((workspace) => !ids.includes(workspace.id))
+      );
+      toast({
+        variant: "destructive",
+        title: "Workspace(s) Deleted",
+        description: `${ids.length} Workspace(s) were deleted successfully`,
+      });
+    }
     setRowSelection({});
   };
 
   const handleCreate = async () => {
-    console.log("Create workspace");
-    const {data, success} = await createWorkspace({title: "Workspace"})
-    if(success && data){
-      //toast
+    console.log("Workspace created");
+    const { data, success, error } = await createWorkspace({
+      title: "Workspace",
+    });
+    if (success && data) {
       router.push(`/workspace/${data.id}`);
+      toast({
+        title: "Created Workspace",
+        description: "Now you can work here!",
+      });
+    } else if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.toString(),
+      });
     }
-    else{
-      //toast
-    }
-
   };
 
   const columns: ColumnDef<Workspace>[] = [
@@ -183,80 +212,97 @@ export function WorkspaceTable() {
 
   return (
     <div className="w-full">
-      {isLoading ?
-      <div className="absolute right-1/2 top-1/2 translate-x-[50%] ">
-      <BarLoader/>
-      </div>
-      :
-      <>
-      <div className="flex justify-between gap-4 items-center py-4">
-        <Input
-          placeholder="Filter titles..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
-          className="max-w-sm"
-        />
-        <div className="gap-2 flex">
-          <Button size={'sm'} variant="outline" onClick={handleCreate}>
-            Create
-          </Button>
-          <Button
-            size={'sm'}
-            variant="destructive"
-            onClick={() => handleDelete(selectedRowIds)}
-            disabled={isDeleteButtonDisabled}
-          >
-            Delete
-          </Button>
+      {isLoading ? (
+        <div className="absolute right-1/2 top-1/2 translate-x-[50%] ">
+          <BarLoader />
         </div>
-      </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} className="px-4 text-left">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="px-4 text-left">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-      </div>
-      </>
-      }
+      ) : (
+        <>
+          <div className="flex justify-between gap-4 items-center py-4">
+            <Input
+              placeholder="Filter titles..."
+              value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+              onChange={(event) =>
+                table.getColumn("title")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm"
+            />
+            <div className="gap-2 flex">
+              <Button size={"sm"} variant="outline" onClick={handleCreate}>
+                Create
+              </Button>
+              <Button
+                size={"sm"}
+                variant="destructive"
+                onClick={() => handleDelete(selectedRowIds)}
+                disabled={isDeleteButtonDisabled}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id} className="px-4 text-left">
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                <AnimatePresence>
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <motion.tr
+                        key={row.original.id} 
+                        data-state={row.getIsSelected() && "selected"}
+                        exit={{ scale: .8,  opacity: 0 }}
+                        transition={{ duration: .2 }}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id} className="px-4 text-left">
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </motion.tr>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        No results.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </AnimatePresence>
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <div className="flex-1 text-sm text-muted-foreground">
+              {table.getFilteredSelectedRowModel().rows.length} of{" "}
+              {table.getFilteredRowModel().rows.length} row(s) selected.
+            </div>
+          </div>
+        </>
+      )}
     </div>
-    
   );
 }

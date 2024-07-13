@@ -29,3 +29,18 @@ export const getLastWorkspaces = async ({ n }: { n?: number }) => {
     return { error: err, success: false };
   }
 };
+
+export const deleteWorkspaces = async (ids: string[]) => {
+  try{
+    await prisma.workspace.deleteMany({
+      where: {
+        id: {
+          in: ids
+        }
+      }
+    })
+    return { success: true }
+  }catch(err){
+    return {error: err, success: false}
+  }
+};

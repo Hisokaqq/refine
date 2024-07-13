@@ -3,8 +3,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const Loader = () => {
+  
   return (
-    <motion.div initial={{opacity: 1}} animate={{opacity: 0}} transition={{delay: 1.3}} className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>
+      <motion.div initial={{opacity: 1}} animate={{opacity: 0}} transition={{delay: 1.3}} className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>
       <div className='flex flex-col items-center  w-24'>
         <div className="overflow-hidden  h-[2rem]">
           <motion.h3 

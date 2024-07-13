@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/navigation-menu';
 import Link from 'next/link';
 import React from 'react';
+import { Skeleton } from '../ui/skeleton';
 
 const ListItem = React.forwardRef<
   React.ElementRef<'a'>,
@@ -32,10 +33,13 @@ const ListItem = React.forwardRef<
 ListItem.displayName = 'ListItem';
 
 
+type NavigationWorkspacesProps = {
+  workspaces: Workspace[];
+  isLoading: boolean;
+}
 
 
-
-function NavigationWorkspaces({ workspaces }: Workspaces) {
+function NavigationWorkspaces({ workspaces, isLoading }: NavigationWorkspacesProps) {
   return (
     <NavigationMenu>
       <NavigationMenuList>
@@ -44,6 +48,18 @@ function NavigationWorkspaces({ workspaces }: Workspaces) {
             Workspaces
           </NavigationMenuTrigger>
           <NavigationMenuContent>
+            {isLoading ? <ul className="flex flex-col w-[200px] space-x-1 p-2">
+              {
+                [1,2,3].map((n) => (
+                  <div key={n} className='space-y-2 p-2'>
+                    <Skeleton className=" h-[15px] rounded-full" />
+                    <Skeleton className=" h-[10px] rounded-full w-2/3" />
+                  </div>
+
+                ))
+              }
+            </ul>
+            :
             <ul className="flex flex-col w-[200px] gap-1 p-2">
               {workspaces.length > 0 ? (
                 workspaces.map((workspace) => (
@@ -57,7 +73,7 @@ function NavigationWorkspaces({ workspaces }: Workspaces) {
                   <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">You don&apos;t have any projects yet.</p>
                 </li>
               )}
-            </ul>
+            </ul>}
           </NavigationMenuContent>
         </NavigationMenuItem>
       </NavigationMenuList>
