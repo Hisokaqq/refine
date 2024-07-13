@@ -42,6 +42,7 @@ import {
   getLastWorkspaces,
 } from "@/app/actions/workspace.action";
 import { useRouter } from "next/navigation";
+import { shorteningText } from "@/utils/shorteningText";
 
 export function WorkspaceTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -138,7 +139,7 @@ export function WorkspaceTable() {
       cell: ({ row }) => (
         <Link href={`/workspace/${row.original.id}`} target="_blank">
           <Button variant="link" className="text-left pl-0">
-            {row.getValue("title")}
+            {shorteningText(row.getValue("title") as string, 60)}
           </Button>
         </Link>
       ),

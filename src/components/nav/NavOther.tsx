@@ -38,9 +38,9 @@ const NavOther = () => {
   }, [pathname, isValidPath]);
 
   if (!isValidPath) return null;
-
+  
   return (
-    <motion.nav initial={{opacity: 0}} animate={{opacity:1}} transition={{delay:1.3, duration: .3}} className='shadow-sm p-2 flex items-center justify-between px-7'>
+    <motion.nav initial={{opacity: 0}} animate={{opacity:1}} transition={{delay: pathname == "/home" ? 1.3 : 0, duration: .3}} className='shadow-sm p-2 flex items-center justify-between px-7'>
       <div className='flex gap-3 items-center'>
         <Link href='/home'>
           <Button className='pl-0 font-medium' variant="link">Home</Button>

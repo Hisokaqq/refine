@@ -1,6 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-const HiddenAnimation = ({children}:{children: React.ReactNode}) => {
+const HiddenAnimation = ({children, animate}:{children: React.ReactNode, animate: boolean}) => {
+  if (!animate) return <>{children}</>
   return (
     <div  className="overflow-hidden">
     <motion.div

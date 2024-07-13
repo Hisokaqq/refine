@@ -28,7 +28,7 @@ const NavLandingAuth = () => {
     <nav className='shadow-sm p-2 flex items-center justify-between px-7'>
         
       <div className='flex gap-3 items-center'>
-        <HiddenAnimation>
+        <HiddenAnimation animate={pathname == "/"}>
         <Link href="/" className='flex flex-col items-center w-16'>
             <h3 className="font-semibold tracking-wider">Refine</h3>
           <motion.div
@@ -40,7 +40,7 @@ const NavLandingAuth = () => {
         </Link>
         </HiddenAnimation>
       </div>
-        <HiddenAnimation>
+        <HiddenAnimation animate={pathname == "/"}>
         <Link href={`${user ? "/home" : "/auth"}`}>
           <Button className="relative inline-flex items-center space-x-1 group">
             <span>Get Started</span>

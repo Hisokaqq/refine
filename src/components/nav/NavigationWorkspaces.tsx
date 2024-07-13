@@ -9,6 +9,7 @@ import {
 import Link from 'next/link';
 import React from 'react';
 import { Skeleton } from '../ui/skeleton';
+import { shorteningText } from '@/utils/shorteningText';
 
 const ListItem = React.forwardRef<
   React.ElementRef<'a'>,
@@ -22,6 +23,7 @@ const ListItem = React.forwardRef<
           href={`/workspace/${id}`}
           className={`block select-none space-y-1 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground ${className}`}
           {...props}
+          target='_blank'
         >
           <div className="text-xs font-medium leading-none">{title?.substring(0, 60)}</div>
           <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">{children}</p>
@@ -63,7 +65,7 @@ function NavigationWorkspaces({ workspaces, isLoading }: NavigationWorkspacesPro
             <ul className="flex flex-col w-[200px] gap-1 p-2">
               {workspaces.length > 0 ? (
                 workspaces.map((workspace) => (
-                  <ListItem key={workspace.id} id={workspace.id} title={workspace.title}>
+                  <ListItem key={workspace.id} id={workspace.id} title={shorteningText(workspace.title, 25)}>
                     {`Last changed: ${workspace.updatedAt ? workspace.updatedAt.toLocaleDateString() : 'N/A'}`}
                   </ListItem>
                 ))
