@@ -46,3 +46,26 @@ model Message {
   chatId    String
   chat      Chat @relation(fields: [chatId], references: [id]) // Many-to-One relationship with Chat
 }
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  hashedPassword  String?
+  picture   String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  sessions  Session[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id]) 
+  expiredAt DateTime @default(now())
+}

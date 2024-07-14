@@ -20,9 +20,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <NavLandingAuth />
-        <NavOther />
-        {children}
+        <div className=" fixed top-0 left-0 w-full z-20 backdrop-blur-sm bg-white/30">
+          <NavLandingAuth />
+          <NavOther />
+        </div>
+        <div className="pt-[3rem] min-h-[calc(100vh-3rem)]">
+          {children}
+        </div>
         <Toaster />
       </body>
     </html>
