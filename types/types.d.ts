@@ -9,3 +9,14 @@ type Workspaces = {
     workspaces: Workspace[];
 };
 
+type User = {
+
+    id: string;
+  
+    email: string;
+  
+    name: string;
+  
+    pictureUrl: string | null;
+  
+  };

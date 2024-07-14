@@ -21,6 +21,8 @@ import {
     FormMessage,
   } from "@/components/ui/form"
 import { SignUp } from './auth.action'
+import { useToast } from '@/components/ui/use-toast'
+import { useRouter } from 'next/navigation'
 
 export const SignUpSchema = z.object({
   name: z.string().min(5, {message: 'name must be at least 5 characters long'}),
@@ -31,6 +33,8 @@ export const SignUpSchema = z.object({
 
 const SignUpTab = () => {
     const [isLoading, setIsLoading] = React.useState(false)
+    const { toast } = useToast();
+    const router = useRouter()
     const form = useForm<z.infer<typeof SignUpSchema>>({
         resolver: zodResolver(SignUpSchema),
         defaultValues: {
@@ -44,7 +48,20 @@ const SignUpTab = () => {
 
     const onSubmit = async (data: z.infer<typeof SignUpSchema>) => {
         setIsLoading(true)
-        SignUp(data)
+        const { success, error } = await SignUp(data)
+        if (success){
+          toast({
+            title: "Success",
+            description: "You have successfully signed up"
+          })
+          router.push('/home')
+        }else if (error){
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: error.toString(),
+          });
+        }
         setIsLoading(false)
     }
   return (

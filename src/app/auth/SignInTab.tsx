@@ -21,6 +21,8 @@ import {
     FormMessage,
   } from "@/components/ui/form"
 import { SignIn } from './auth.action'
+import { useToast } from '@/components/ui/use-toast'
+import { useRouter } from 'next/navigation'
 
 export const SignInSchema = z.object({
   email: z.string().email(),
@@ -28,6 +30,8 @@ export const SignInSchema = z.object({
 })
 
 const SignInTab = () => {
+    const { toast } = useToast();
+    const router = useRouter()
     const [isLoading, setIsLoading] = React.useState(false)
     const form = useForm<z.infer<typeof SignInSchema>>({
         resolver: zodResolver(SignInSchema),
@@ -39,9 +43,22 @@ const SignInTab = () => {
     
 
     const onSubmit = async (data: z.infer<typeof SignInSchema>) => {
-        setIsLoading(true)
-        await SignIn(data)
-        setIsLoading(false)
+      setIsLoading(true)
+      const { success, error } = await SignIn(data)
+      if (success){
+        toast({
+          title: "Success",
+          description: "You have successfully signed ip"
+        })
+        router.push('/home')
+      }else if (error){
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.toString(),
+        });
+      }
+      setIsLoading(false)
     }
   return (
     <Card className="w-[350px]">

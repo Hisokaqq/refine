@@ -47,15 +47,23 @@ model Message {
   chat      Chat @relation(fields: [chatId], references: [id]) // Many-to-One relationship with Chat
 }
 
+
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  hashedPassword  String?
-  picture   String?
-  role      Role     @default(USER)
+  id       String      @id @default(cuid())
+  email    String   @unique
+  name     String
+  role     Role      @default(USER)
+  hashedPassword String?
   createdAt DateTime @default(now())
-  sessions  Session[]
+  pictureUrl String?
+  sessions Session[]
+}
+
+model Session {
+  id       String    @id @default(cuid())
+  userId    String
+  expiresAt DateTime
+  user User @relation(fields: [userId], references: [id])
 }
 
 enum Role {
@@ -63,9 +71,3 @@ enum Role {
   ADMIN
 }
 
-model Session {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id]) 
-  expiredAt DateTime @default(now())
-}
