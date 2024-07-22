@@ -23,7 +23,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className=" fixed top-0 left-0 w-full z-20 backdrop-blur-sm bg-white/30">
+        <div className=" fixed top-0 left-0 w-full z-20 bg-white">
           <Nav user={user} />
           <Checker user={user} />
         </div>

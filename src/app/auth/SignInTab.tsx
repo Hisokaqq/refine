@@ -23,6 +23,7 @@ import {
 import { SignIn } from './auth.action'
 import { useToast } from '@/components/ui/use-toast'
 import { useRouter } from 'next/navigation'
+import GoogleButton from '@/components/GoogleButton'
 
 export const SignInSchema = z.object({
   email: z.string().email(),
@@ -95,12 +96,11 @@ const SignInTab = () => {
             </FormItem>
           )}
         />
-        <div className="flex flex-col gap-2 pt-3 ">
             <Button disabled={isLoading} className='w-full' type="submit">Sign in</Button>
-            <Button disabled={isLoading} className='w-full' variant="outline">Sign in with Google</Button>
-        </div>
+            
       </form>
     </Form>
+    <GoogleButton isLoading={isLoading} />
     </CardContent>
   </Card>
   )

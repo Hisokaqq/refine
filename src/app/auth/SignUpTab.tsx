@@ -23,6 +23,7 @@ import {
 import { SignUp } from './auth.action'
 import { useToast } from '@/components/ui/use-toast'
 import { useRouter } from 'next/navigation'
+import GoogleButton from '@/components/GoogleButton'
 
 export const SignUpSchema = z.object({
   name: z.string().min(5, {message: 'name must be at least 5 characters long'}),
@@ -125,12 +126,10 @@ const SignUpTab = () => {
             </FormItem>
           )}
         />
-        <div className="flex flex-col gap-2 pt-3 ">
             <Button disabled={isLoading} className='w-full' type="submit">Sign up</Button>
-            <Button disabled={isLoading} className='w-full' variant="outline">Sign up with Google</Button>
-        </div>
       </form>
     </Form>
+    <GoogleButton isLoading={isLoading} />
     </CardContent>
   </Card>
   )

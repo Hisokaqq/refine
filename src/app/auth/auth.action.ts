@@ -7,6 +7,8 @@ import { Argon2id } from "oslo/password"
 import { lucia } from '@/lib/lucia'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { generateCodeVerifier, generateState } from 'arctic'
+import { googleOauthClient } from '@/lib/googleOauth'
 export const SignIn = async (data: z.infer<typeof SignInSchema>) => {
     try{
         const user = await prisma.user.findUnique({
@@ -65,4 +67,20 @@ export const SignOut = async () => {
     const sessionCookie = lucia.createBlankSessionCookie()
     cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
     return redirect('/auth')
+}
+
+export const getGoogleOauthConsentUrl = async () => {
+    try{
+        const state = generateState()
+        const codeVerifier = generateCodeVerifier()
+        
+        cookies().set('codeVerifier', codeVerifier, { secure: process.env.NODE_ENV === "production"})
+        cookies().set('state', state, { secure: process.env.NODE_ENV === "production"})
+        const authUrl = await googleOauthClient.createAuthorizationURL(state, codeVerifier, {
+            scopes: ['email', 'profile']
+        })
+        return { success: true, url: authUrl.toString()}
+    }catch(err){
+        return { error: "Something went wrong", success: false}
+    }
 }
