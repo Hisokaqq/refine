@@ -100,7 +100,7 @@ const SignInTab = () => {
             
       </form>
     </Form>
-    <GoogleButton isLoading={isLoading} />
+    <GoogleButton content='Sign in with Google' isLoading={isLoading} />
     </CardContent>
   </Card>
   )

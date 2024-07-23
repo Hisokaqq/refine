@@ -126,10 +126,10 @@ const SignUpTab = () => {
             </FormItem>
           )}
         />
-            <Button disabled={isLoading} className='w-full' type="submit">Sign up</Button>
+          <Button disabled={isLoading} className='w-full' type="submit">Sign up</Button>
       </form>
     </Form>
-    <GoogleButton isLoading={isLoading} />
+    <GoogleButton content='Sign up with Google' isLoading={isLoading} />
     </CardContent>
   </Card>
   )

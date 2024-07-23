@@ -3,7 +3,12 @@ import { Button } from './ui/button'
 import { getGoogleOauthConsentUrl } from '@/app/auth/auth.action'
 import { useToast } from './ui/use-toast';
 
-const GoogleButton = ({isLoading}: {isLoading: boolean}) => {
+type GoogleButtonProps = {
+    content: string,
+    isLoading: boolean
+}
+
+const GoogleButton = ({content, isLoading}: GoogleButtonProps) => {
     const { toast } = useToast();
     const onClick = async () => {
         const res = await getGoogleOauthConsentUrl()
@@ -20,7 +25,7 @@ const GoogleButton = ({isLoading}: {isLoading: boolean}) => {
 
     }
   return (
-    <Button disabled={isLoading} onClick={onClick} className='w-full mt-2' variant="outline">Sign in with Google</Button>
+    <Button disabled={isLoading} onClick={onClick} className='w-full mt-2' variant="outline">{content}</Button>
   )
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import {
   ColumnDef,
@@ -43,41 +43,41 @@ import {
 } from "@/app/actions/workspace.action";
 import { useRouter } from "next/navigation";
 import { shorteningText } from "@/utils/shorteningText";
+import useWorkspaceStore from "@/stores/useWorkspaceStore";
 
 export function WorkspaceTable() {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
   );
-  const [rowSelection, setRowSelection] = React.useState<{
+  const [rowSelection, setRowSelection] = useState<{
     [key: string]: boolean;
   }>({});
-  const [data, setData] = React.useState<Workspace[]>([]);
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  
   const router = useRouter();
+  const { workspaces, isLoading, error, fetchWorkspaces} = useWorkspaceStore()
+  const [data, setData] = useState<Workspace[]>(workspaces);
   const { toast } = useToast();
+  useEffect(() => {
+    if (workspaces.length === 0) {
+      fetchWorkspaces({});
+    }
+    else if(error){
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.toString(),
+      });
+      return
+    } 
+    setData(workspaces);
 
-  React.useEffect(() => {
-    const fetchWorkspaces = async () => {
-      setIsLoading(true);
-      const { workspaces, success, error } = await getLastWorkspaces({});
-      if (success && workspaces) {
-        setData(workspaces);
-      } else if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: error.toString(),
-        });
-      }
-      setIsLoading(false);
-    };
-    fetchWorkspaces();
-  }, []);
+  }, [fetchWorkspaces, workspaces.length]);
+
+
 
   const handleDelete = async (ids: string[]) => {
     const { success } = await deleteWorkspaces(ids);
-    if (success) {
       setData((prevData) =>
         prevData.filter((workspace) => !ids.includes(workspace.id))
       );
@@ -86,7 +86,6 @@ export function WorkspaceTable() {
         title: "Workspace(s) Deleted",
         description: `${ids.length} Workspace(s) were deleted successfully`,
       });
-    }
     setRowSelection({});
   };
 

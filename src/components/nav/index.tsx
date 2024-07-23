@@ -9,7 +9,7 @@ import HiddenAnimation from '@/app/helpers/HiddenAnimation';
 import { usePathname } from 'next/navigation';
 import DropdownProfile from './DropdownProfile';
 import NavigationWorkspaces from './NavigationWorkspaces';
-import { getLastWorkspaces } from '@/app/actions/workspace.action';
+import useWorkspaceStore from '@/stores/useWorkspaceStore';
 
 type UserProps = {
   user: User | null;
@@ -18,26 +18,16 @@ type UserProps = {
 const Nav = ({ user }: UserProps) => {
   const pathname = usePathname();
   const [isValidPath, setIsValidPath] = useState(false);
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
+  const { workspaces, isLoading, error, fetchWorkspaces} = useWorkspaceStore()
   useEffect(() => {
     setIsValidPath(!(pathname === '/' || pathname === '/auth') || pathname === '/' || pathname === '/auth');
   }, [pathname, user]);
 
   useEffect(() => {
     if (isValidPath && !(pathname === '/' || pathname === '/auth')) {
-      const fetchWorkspaces = async () => {
-        setIsLoading(true);
-        const { workspaces, success } = await getLastWorkspaces({ n: 5 });
-        if (success && workspaces) {
-          setWorkspaces(workspaces);
-        }
-        setIsLoading(false);
-      };
-      fetchWorkspaces();
+      fetchWorkspaces({});
     }
-  }, [pathname, isValidPath]);
+  }, [isValidPath, pathname, fetchWorkspaces]);
 
   if (!isValidPath) return null;
 
@@ -82,7 +72,7 @@ const Nav = ({ user }: UserProps) => {
             Home
           </Button>
         </Link>
-        <NavigationWorkspaces isLoading={isLoading} workspaces={workspaces} />
+        <NavigationWorkspaces isLoading={isLoading} workspaces={workspaces.slice(0,5)} />
       </div>
       <div className='flex items-center space-x-3'>
         <DropdownProfile name={user?.name ?? null} pictureUrl={user?.pictureUrl ?? null} />
