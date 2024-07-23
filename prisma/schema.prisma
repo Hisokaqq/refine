@@ -19,6 +19,8 @@ model Workspace {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tabs      Tab[]    // One-to-Many relationship with Tab
+  user      User     @relation(fields: [userId], references: [id]) // Many-to-One relationship with User
+  userId    String
 }
 
 model Tab {
@@ -57,6 +59,7 @@ model User {
   createdAt DateTime @default(now())
   pictureUrl String?
   sessions Session[]
+  workspaces Workspace[]
 }
 
 model Session {
