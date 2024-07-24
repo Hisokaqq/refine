@@ -39,12 +39,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   createWorkspace,
   deleteWorkspaces,
-  getLastWorkspaces,
 } from "@/app/actions/workspace.action";
 import { useRouter } from "next/navigation";
 import { shorteningText } from "@/utils/shorteningText";
 import useWorkspaceStore from "@/stores/useWorkspaceStore";
-
+import { MoonLoader} from "react-spinners"
 export function WorkspaceTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
@@ -57,7 +56,10 @@ export function WorkspaceTable() {
   const router = useRouter();
   const { workspaces, isLoading, error, fetchWorkspaces} = useWorkspaceStore()
   const [data, setData] = useState<Workspace[]>(workspaces);
+  const [isLoadingCreact, setIsLoadingCreate] = useState(false);
+  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const { toast } = useToast();
+  
   useEffect(() => {
     if (workspaces.length === 0) {
       fetchWorkspaces({});
@@ -77,6 +79,7 @@ export function WorkspaceTable() {
 
 
   const handleDelete = async (ids: string[]) => {
+    setIsLoadingDelete(true);
     const { success } = await deleteWorkspaces(ids);
       setData((prevData) =>
         prevData.filter((workspace) => !ids.includes(workspace.id))
@@ -87,10 +90,11 @@ export function WorkspaceTable() {
         description: `${ids.length} Workspace(s) were deleted successfully`,
       });
     setRowSelection({});
+    setIsLoadingDelete(false);
   };
 
   const handleCreate = async () => {
-    console.log("Workspace created");
+    setIsLoadingCreate(true);
     const { data, success, error } = await createWorkspace({
       title: "Workspace",
     });
@@ -107,6 +111,7 @@ export function WorkspaceTable() {
         description: error.toString(),
       });
     }
+    setIsLoadingCreate(true);
   };
 
   const columns: ColumnDef<Workspace>[] = [
@@ -228,16 +233,16 @@ export function WorkspaceTable() {
               className="max-w-sm"
             />
             <div className="gap-2 flex">
-              <Button size={"sm"} variant="outline" onClick={handleCreate}>
-                Create
+              <Button size={"sm"} variant="outline" disabled={isLoadingCreact} onClick={handleCreate}>
+              {isLoadingCreact ? <MoonLoader size={20} color="#000" /> : "Create"}
               </Button>
               <Button
                 size={"sm"}
                 variant="destructive"
                 onClick={() => handleDelete(selectedRowIds)}
-                disabled={isDeleteButtonDisabled}
+                disabled={isDeleteButtonDisabled || isLoadingDelete}
               >
-                Delete
+                {isLoadingDelete ? <MoonLoader size={20} color="#fff" /> : "Delete"}
               </Button>
             </div>
           </div>

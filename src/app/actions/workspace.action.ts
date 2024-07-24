@@ -39,8 +39,12 @@ export const getLastWorkspaces = async ({ n }: { n?: number }) => {
       orderBy: {
         updatedAt: 'desc',
       },
+      select: {
+        id: true,
+        title: true,
+        updatedAt: true,
+      }
     });
-    console.log("fetching workspaces");
 
     return { workspaces, success: true };
   } catch (err) {
@@ -69,4 +73,113 @@ export const deleteWorkspaces = async (ids: string[]) => {
   }
 };
 
+export const getSingleWorkspace = async (id: string) => {
+  const user = await getUser()
+  if (!user) {
+    return { error: "You are not logged in", success: false };
+  }
 
+  try{
+    const workspace = await prisma.workspace.findUnique({
+      where: {
+        id: id,
+        userId: user.id
+      },
+      select: {
+        id: true,
+        title: true,
+        tabs: {
+          select: {
+            id: true,
+            title: true,
+            content: true,
+            updatedAt: true
+          }
+        }
+      }
+    })
+    if (!workspace) {
+      return { error: "Workspace not found", success: false };
+    }
+    return { workspace, success: true }
+  }catch(err){
+    return { error: err, success: false }
+  }
+};
+
+
+export const createTab = async (workspaceId:string) => {
+  console.log("Creating tab for workspace:", workspaceId);
+  const user = await getUser();
+  if (!user) {
+    console.error("User not logged in");
+    return { error: "You are not logged in", success: false };
+  }
+  
+
+  try {
+
+    if (!workspaceId) {
+      console.error("Workspace ID is required");
+      return { error: "Workspace ID is required", success: false };
+    }
+
+    // Check if the workspace exists
+    const workspace = await prisma.workspace.findFirst({
+      where: {
+        id: workspaceId,
+        userId: user.id,
+      },
+    });
+
+    if (!workspace) {
+      console.error("Workspace not found for user:", user.id);
+      return { error: "Workspace not found", success: false };
+    }
+
+    
+    const tab = await prisma.tab.create({
+      data: {
+        title: "New Tab",
+        content: "Write something here",
+        workspace: {
+          connect: {
+            id: workspace.id,
+          },
+        },
+      },
+    });
+
+    // Convert Date objects to strings
+    const plainTab = {
+      ...tab,
+      createdAt: tab.createdAt.toISOString(),
+      updatedAt: tab.updatedAt.toISOString()
+    };
+    return { tab: plainTab, success: true };
+  } catch (err) {
+    console.error("Error creating tab:", err);
+    return { error: err, success: false };
+  }
+};
+
+export const deleteTab = async (id: string) => {
+  const user = await getUser();
+  if (!user) {
+    return { error: "You are not logged in", success: false };
+  }
+  try{
+    await prisma.tab.delete({
+      where: {
+        id: id,
+        workspace:{
+          userId: user.id
+        }
+      }
+    })
+    return { success: true }
+  }
+  catch(err){
+    return { error: err, success: false }
+  }
+}
