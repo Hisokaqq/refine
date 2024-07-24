@@ -2,6 +2,7 @@ import { Reorder, motion } from 'framer-motion';
 import React, { useState, useRef, useEffect } from 'react';
 import { Cross1Icon } from "@radix-ui/react-icons";
 import { updateTab } from '@/app/actions/workspace.action';
+import { shorteningText } from '@/utils/shorteningText';
 
 type TabProps = {
   item: Tab;
@@ -71,7 +72,7 @@ const Tab = ({ item, isSelected, onClick, onRemove, onUpdateTitle }: TabProps) =
           className={`bg-transparent border-none outline-none tab-input-${item.id}`}
         />
       ) : (
-        <motion.span layout="position" className={`tab-title-${item.id}`}>{item.title}</motion.span>
+        <motion.span layout="position" className={`tab-title-${item.id}`}>{shorteningText(item.title, 23)}</motion.span>
       )}
       <motion.div layout>
         <motion.button

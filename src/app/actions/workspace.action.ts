@@ -99,7 +99,7 @@ export const getSingleWorkspace = async (id: string) => {
       }
     })
     if (!workspace) {
-      return { error: "Workspace not found", success: false };
+      return { error: "Workspace not found or aren't yours", success: false };
     }
     return { workspace, success: true }
   }catch(err){
@@ -109,7 +109,6 @@ export const getSingleWorkspace = async (id: string) => {
 
 
 export const createTab = async (workspaceId:string) => {
-  console.log("Creating tab for workspace:", workspaceId);
   const user = await getUser();
   if (!user) {
     console.error("User not logged in");

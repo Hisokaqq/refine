@@ -1,26 +1,30 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AnimatePresence, Reorder, motion } from "framer-motion";
 import TabComponent from './Tab';
 import { PlusIcon } from '@radix-ui/react-icons';
 import './tabs.css';
 import { createTab, deleteTab } from '@/app/actions/workspace.action';
+import { useSignleWorkspaceStore } from '@/stores/useWorkspaceStore';
 
-type TabsProps = {
-  workspaceId: string;
-  tabs: Tab[];
-};
-
-const Tabs = ({ workspaceId, tabs }: TabsProps ) => {
-  const [items, setItems] = useState<Tab[]>(tabs);
-  const [selectedTab, setSelectedTab] = useState<Tab | null>(items[items.length - 1] || null);
+const Tabs = () => {
+  const { workspace, setSelectedTab, selectedTab } = useSignleWorkspaceStore();
+  const { id: workspaceId, tabs } = workspace ?? { id: '1', tabs: [] };
+  const [items, setItems] = useState<Tab[]>(tabs ?? []);
   const [isAdding, setIsAdding] = useState<boolean>(false);
+
+  useEffect(() => {
+    if(tabs){
+      setItems(tabs);
+      setSelectedTab(tabs[tabs.length - 1] || null);
+    }
+  }, [tabs, setSelectedTab]);
 
   const add = async () => {
     setIsAdding(true);
-    const tempTabId = `Loading...`;
-    const newTab = { id: "Loading...", title: tempTabId, content: "", updatedAt: "1" };
+    const tempTabId = `temp-${Date.now()}`;
+    const newTab = { id: tempTabId, title: 'Loading...', content: "", updatedAt: new Date().toISOString() };
     setItems(prevItems => [...prevItems, newTab]);
     setSelectedTab(newTab);
 
@@ -28,9 +32,9 @@ const Tabs = ({ workspaceId, tabs }: TabsProps ) => {
     setIsAdding(false);
 
     if (response.success && response.tab) {
-      setItems(prevItems => 
-        prevItems.map(item => 
-          item.id === tempTabId ? response.tab : item
+      setItems(prevItems =>
+        prevItems.map(item =>
+          item.id === tempTabId ? { ...item, ...response.tab, id: response.tab.id } : item
         )
       );
       setSelectedTab(response.tab);
@@ -43,7 +47,7 @@ const Tabs = ({ workspaceId, tabs }: TabsProps ) => {
   const remove = async (item: Tab) => {
     setItems(prevItems => prevItems.filter(i => i.id !== item.id));
     if (selectedTab?.id === item.id) {
-      setSelectedTab(items.length > 0 ? items[0] : null);
+      setSelectedTab(tabs!.length > 0 ? items[0] : null);
     }
     try {
       await deleteTab(item.id);
@@ -53,13 +57,12 @@ const Tabs = ({ workspaceId, tabs }: TabsProps ) => {
   };
 
   const updateTitle = (id: string, newTitle: string) => {
-    setItems(prevItems => 
-      prevItems.map(item => 
+    setItems(prevItems =>
+      prevItems.map(item =>
         item.id === id ? { ...item, title: newTitle } : item
       )
     );
   };
-
 
   return (
     <div className='w-full flex h-8 overflow-hidden'>
@@ -83,10 +86,10 @@ const Tabs = ({ workspaceId, tabs }: TabsProps ) => {
         </AnimatePresence>
       </Reorder.Group>
       <motion.button
-        className="cursor-pointer w-8 flex items-center justify-center"
+        className={`${(isAdding || items.length === 5) ? "opacity-50" : ""} cursor-pointer w-8 flex items-center justify-center `}
         onClick={add}
         disabled={isAdding || items.length === 5}
-        whileTap={{ scale: 0.7 }}
+        whileTap={!(isAdding || items.length === 5) ? { scale: 0.8 } : {}}
       >
         <PlusIcon className='w-4 h-4' />
       </motion.button>

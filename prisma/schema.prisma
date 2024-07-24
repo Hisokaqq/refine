@@ -30,7 +30,7 @@ model Tab {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id]) // Many-to-One relationship with Workspace
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade) // Many-to-One relationship with Workspace
   chat        Chat?
 }
 

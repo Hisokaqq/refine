@@ -3,6 +3,7 @@ type Workspace = {
     title: string;
     updatedAt?: Date;
     createdAt?: Date;
+    tabs?: Tab[];
   };
   
   type Workspaces = {

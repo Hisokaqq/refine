@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { getUser } from "@/lib/lucia";
 import Nav from "@/components/nav";
 import Checker from "./Checker";
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -31,6 +31,7 @@ export default async function RootLayout({
           {children}
         </div>
         <Toaster />
+        <SpeedInsights />
       </body>
     </html>
   );
