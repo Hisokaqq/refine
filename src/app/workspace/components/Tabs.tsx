@@ -52,6 +52,15 @@ const Tabs = ({ workspaceId, tabs }: TabsProps ) => {
     }
   };
 
+  const updateTitle = (id: string, newTitle: string) => {
+    setItems(prevItems => 
+      prevItems.map(item => 
+        item.id === id ? { ...item, title: newTitle } : item
+      )
+    );
+  };
+
+
   return (
     <div className='w-full flex h-8 overflow-hidden'>
       <Reorder.Group
@@ -63,6 +72,7 @@ const Tabs = ({ workspaceId, tabs }: TabsProps ) => {
         <AnimatePresence initial={false}>
           {items.map((item) => (
             <TabComponent
+              onUpdateTitle={updateTitle}
               key={item.id}
               item={item}
               isSelected={selectedTab?.id === item.id}

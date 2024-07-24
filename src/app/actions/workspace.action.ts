@@ -115,8 +115,6 @@ export const createTab = async (workspaceId:string) => {
     console.error("User not logged in");
     return { error: "You are not logged in", success: false };
   }
-  
-
   try {
 
     if (!workspaceId) {
@@ -124,7 +122,6 @@ export const createTab = async (workspaceId:string) => {
       return { error: "Workspace ID is required", success: false };
     }
 
-    // Check if the workspace exists
     const workspace = await prisma.workspace.findFirst({
       where: {
         id: workspaceId,
@@ -183,3 +180,28 @@ export const deleteTab = async (id: string) => {
     return { error: err, success: false }
   }
 }
+
+export const updateTab = async (id: string, title: string, content: string) => {
+  const user = await getUser();
+  if (!user) {
+    return { error: "You are not logged in", success: false };
+  }
+
+  try{
+    await prisma.tab.update({
+      where: {
+        id: id,
+        workspace:{
+          userId: user.id
+        }
+      },
+      data: {
+        title,
+        content,
+      },
+    });
+    return { success: true };
+  }catch(err){
+    return { error: err, success: false };
+  }
+};
