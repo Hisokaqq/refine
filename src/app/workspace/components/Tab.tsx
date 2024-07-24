@@ -20,7 +20,7 @@ const Tab = ({ item, isSelected, onClick, onRemove }: TabProps) => {
       className={`tab cursor-pointer p-2 ${isSelected ? "bg-white" : "bg-gray-200"} flex border items-center justify-between`}
       onPointerDown={onClick}
     >
-      <motion.span layout="position">{item.title}</motion.span>
+      <motion.span layout="position">{item.id}</motion.span>
       <motion.div layout>
         <motion.button
           onPointerDown={(event) => {

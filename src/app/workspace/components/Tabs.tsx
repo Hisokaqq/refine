@@ -11,29 +11,44 @@ type TabsProps = {
   workspaceId: string;
   tabs: Tab[];
 };
+
 const Tabs = ({ workspaceId, tabs }: TabsProps ) => {
   const [items, setItems] = useState<Tab[]>(tabs);
-  const [selectedTab, setSelectedTab] = useState<Tab | null>(items[items.length-1] || null);
+  const [selectedTab, setSelectedTab] = useState<Tab | null>(items[items.length - 1] || null);
+  const [isAdding, setIsAdding] = useState<boolean>(false);
 
   const add = async () => {
+    setIsAdding(true);
+    const tempTabId = `Loading...`;
+    const newTab = { id: "Loading...", title: tempTabId, content: "", updatedAt: "1" };
+    setItems(prevItems => [...prevItems, newTab]);
+    setSelectedTab(newTab);
+
     const response = await createTab(workspaceId);
+    setIsAdding(false);
+
     if (response.success && response.tab) {
-      const tab: Tab = response.tab;
-      if(tab){
-        setItems([...items, tab]);
-        setSelectedTab(tab);
-      }
+      setItems(prevItems => 
+        prevItems.map(item => 
+          item.id === tempTabId ? response.tab : item
+        )
+      );
+      setSelectedTab(response.tab);
     } else {
       console.error("Failed to create tab:", response.error);
+      setItems(prevItems => prevItems.filter(item => item.id !== tempTabId));
     }
   };
 
   const remove = async (item: Tab) => {
-    await deleteTab(item.id);
-    const newItems = items.filter(i => i.id !== item.id);
-    setItems(newItems);
+    setItems(prevItems => prevItems.filter(i => i.id !== item.id));
     if (selectedTab?.id === item.id) {
-      setSelectedTab(newItems.length > 0 ? newItems[0] : null);
+      setSelectedTab(items.length > 0 ? items[0] : null);
+    }
+    try {
+      await deleteTab(item.id);
+    } catch (error) {
+      console.error("Failed to delete tab:", error);
     }
   };
 
@@ -60,7 +75,7 @@ const Tabs = ({ workspaceId, tabs }: TabsProps ) => {
       <motion.button
         className="cursor-pointer w-8 flex items-center justify-center"
         onClick={add}
-        disabled={items.length === 5}
+        disabled={isAdding || items.length === 5}
         whileTap={{ scale: 0.7 }}
       >
         <PlusIcon className='w-4 h-4' />
