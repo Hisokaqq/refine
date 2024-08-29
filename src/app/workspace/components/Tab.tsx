@@ -76,6 +76,7 @@ const Tab = ({ item, isSelected, onClick, onRemove, onUpdateTitle }: TabProps) =
       )}
       <motion.div layout>
         <motion.button
+          whileHover={{ color: "#6b6b6b" }}
           onPointerDown={(event) => {
             event.stopPropagation();
             onRemove();
