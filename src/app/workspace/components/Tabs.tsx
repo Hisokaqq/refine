@@ -65,9 +65,9 @@ const Tabs = () => {
   };
 
   return (
-    <div className='w-full flex h-8 overflow-hidden'>
+    <div className='w-full h-8 flex-shrink-0 flex overflow-hidden'>
       <Reorder.Group
-        className='tabs'
+        className='tabs h-full'
         axis='x'
         values={items}
         onReorder={setItems}
