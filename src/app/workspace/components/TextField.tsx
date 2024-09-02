@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MathJaxContext } from 'better-react-mathjax';
 import EditableLatexBlock from './EditableLatexBlock';
+import { useSignleWorkspaceStore } from '@/stores/useWorkspaceStore';
 
 interface Block {
   id: string;
@@ -10,14 +11,20 @@ interface Block {
 }
 
 const TextField: React.FC = () => {
-  const [blocks, setBlocks] = useState<Block[]>([
-    { id: "1", value: "Here is some example LaTeX: $$E=mc^2$$", is_opened: true },
-    { id: "2", value: "Another example: $$\\frac{a}{b} + \\frac{c}{d} = \\frac{ad + bc}{bd}$$", is_opened: true },
-    { id: "3", value: "New block. Edit this to add your own LaTeX code.", is_opened: true },
-  ]);
+  
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [containerWidth, setContainerWidth] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  const { selectedTab } = useSignleWorkspaceStore();
+  const { content }: { content: string | null } = selectedTab || { content: null };
+  
+  const [blocks, setBlocks] = useState<Block[]>([]);
+  useEffect(() => {
+    if (content){
+      setBlocks(JSON.parse(content));
+    }
+  }, [content]);
 
   const addBlock = (index: number) => {
     const newBlocks = [...blocks];
